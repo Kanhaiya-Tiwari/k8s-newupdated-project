@@ -1,0 +1,47 @@
+# Deployment Order - Run these commands in sequence
+
+# 1. Create namespace
+kubectl apply -f namespace.yml
+
+# 2. Create MongoDB PV and PVC
+kubectl apply -f mongodb-pv.yml
+kubectl apply -f mongodb-pvc.yml
+
+# 3. Create MongoDB Secret
+kubectl apply -f mongodb-secret.yml
+
+# 4. Deploy MongoDB Service first
+kubectl apply -f mongodb-service.yml
+
+# 5. Deploy MongoDB Deployment
+kubectl apply -f mongodb-deployment.yml
+
+# 6. Wait for MongoDB to be ready
+kubectl wait --for=condition=ready pod -l app=mongodb -n chat-app --timeout=120s
+
+# 7. Create Backend Config and Secret
+kubectl apply -f backend-configmap.yml
+kubectl apply -f backend-secret.yml
+
+# 8. Deploy Backend Service first
+kubectl apply -f backend-service.yml
+
+# 9. Deploy Backend Deployment
+kubectl apply -f backend-deployment.yml
+
+# 10. Create Frontend Config
+kubectl apply -f frontend-configmap.yml
+
+# 11. Deploy Frontend Service first
+kubectl apply -f frontend-service.yml
+
+# 12. Deploy Frontend Deployment
+kubectl apply -f frontend-deployment.yml
+
+# 13. Check status
+kubectl get pods -n chat-app
+kubectl get svc -n chat-app
+
+# 14. Get access URL
+minikube ip
+# Frontend: http://<minikube-ip>:30080
